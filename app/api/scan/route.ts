@@ -13,21 +13,6 @@ export async function POST(request: NextRequest) {
   console.log("🚀 [API] Scan endpoint hit")
   
   try {
-    const supabase = await createClient()
-    console.log("✅ [API] Supabase client created")
-
-    // Verify user is authenticated
-    console.log("🔐 [API] Verifying user authentication...")
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-    if (authError || !user) {
-      console.error("❌ [API] Authentication failed:", authError)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
-    console.log("✅ [API] User authenticated:", user.id)
-
     const body = await request.json()
     console.log("📦 [API] Request body:", body)
     const { scanId, url } = body
@@ -39,11 +24,11 @@ export async function POST(request: NextRequest) {
 
     // Update scan status to 'scanning'
     console.log("📝 [API] Updating scan status to 'scanning'...")
+    const supabase = await createClient()
     const { error: updateError } = await supabase
       .from("scans")
       .update({ status: "scanning" })
       .eq("id", scanId)
-      .eq("user_id", user.id)
     
     if (updateError) {
       console.error("❌ [API] Failed to update scan status:", updateError)
@@ -56,7 +41,7 @@ export async function POST(request: NextRequest) {
     
     // Don't wait for the scan to complete - return immediately
     // This prevents Vercel function timeout
-    performScan(scanId, url, user.id).catch((error) => {
+    performScan(scanId, url).catch((error) => {
       console.error("💥 [API] Background scan failed:", error)
     })
 
@@ -71,14 +56,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function performScan(scanId: string, url: string, userId: string) {
+async function performScan(scanId: string, url: string) {
   const startTime = Date.now()
   const supabase = await createClient()
 
   console.log("🔍 [SCAN] Starting vulnerability scan...")
   console.log("📍 [SCAN] Target URL:", url)
   console.log("🆔 [SCAN] Scan ID:", scanId)
-  console.log("👤 [SCAN] User ID:", userId)
 
   try {
     // Perform the vulnerability scan
@@ -104,7 +88,6 @@ async function performScan(scanId: string, url: string, userId: string) {
           scan_duration: Math.round((Date.now() - startTime) / 1000),
         })
         .eq("id", scanId)
-        .eq("user_id", userId)
       return
     }
 
@@ -184,7 +167,6 @@ async function performScan(scanId: string, url: string, userId: string) {
         completed_at: new Date().toISOString(),
       })
       .eq("id", scanId)
-      .eq("user_id", userId)
 
     if (finalUpdateError) {
       console.error("❌ [SCAN] Failed to update scan with results:", finalUpdateError)
@@ -204,7 +186,6 @@ async function performScan(scanId: string, url: string, userId: string) {
           scan_duration: Math.round((Date.now() - startTime) / 1000),
         })
         .eq("id", scanId)
-        .eq("user_id", userId)
       
       console.log("❌ [SCAN] Scan marked as failed")
     } catch (updateError) {
