@@ -107,15 +107,15 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
           <h1 className="text-3xl font-bold text-foreground mb-2">Scan Results</h1>
           <p className="text-muted-foreground">{scan.url}</p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
           {scan.status === "completed" && (
-            <Button variant="outline" onClick={handleExport}>
-              <Download className="w-5 h-5 mr-2" />
+            <Button variant="outline" onClick={handleExport} className="w-full sm:w-auto">
+              <Download className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               Export Report
             </Button>
           )}
-          <Link href="/dashboard">
-            <Button variant="outline">Back to Dashboard</Button>
+          <Link href="/dashboard" className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto">Back to Dashboard</Button>
           </Link>
         </div>
       </div>
@@ -123,25 +123,21 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
       {/* Status Card */}
       <Card className="mb-6">
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {scan.status === "completed" ? (
                 <CheckCircle className="w-12 h-12 text-primary" />
+              ) : scan.status === "scanning" ? (
+                <Loader2 className="w-12 h-12 text-primary animate-spin" />
               ) : scan.status === "failed" ? (
                 <AlertTriangle className="w-12 h-12 text-destructive" />
               ) : (
-                <Loader2 className="w-12 h-12 text-accent animate-spin" />
+                <Clock className="w-12 h-12 text-muted-foreground" />
               )}
               <div>
-                <h3 className="text-xl font-semibold text-foreground">
-                  {scan.status === "completed" && "Scan Complete"}
-                  {scan.status === "scanning" && "Scanning in Progress..."}
-                  {scan.status === "pending" && "Scan Pending..."}
-                  {scan.status === "failed" && "Scan Failed"}
-                </h3>
-                <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
+                <h3 className="text-lg font-semibold text-foreground capitalize">{scan.status}</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
+                  <span>
                     Started {new Date(scan.created_at).toLocaleString()}
                   </span>
                   {scan.scan_duration && <span>Duration: {scan.scan_duration}s</span>}
@@ -149,8 +145,10 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
               </div>
             </div>
             {scan.status === "completed" && (
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-lg px-4 py-2">
-                {vulnerabilityCount} Vulnerabilities Found
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-base sm:text-lg px-3 py-1 sm:px-4 sm:py-2 whitespace-nowrap">
+                <span className="text-sm sm:text-base">{vulnerabilityCount}</span>
+                <span className="hidden sm:inline ml-1">Vulnerabilities Found</span>
+                <span className="sm:hidden ml-1">Found</span>
               </Badge>
             )}
           </div>

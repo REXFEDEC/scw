@@ -37,12 +37,14 @@ export default function LandingPage() {
 
           {/* Hero Image */}
           <div className="mt-12 sm:mt-16 rounded-lg overflow-hidden border border-border shadow-2xl px-4">
-            <ThemeAwareImage 
-              lightSrc="/light.png" 
-              darkSrc="/dark.png" 
-              alt="ScanWeb Dashboard Preview" 
-              className="w-full" 
-            />
+            <div className="relative w-full h-64 sm:h-80 lg:h-96">
+              <ThemeAwareImage 
+                lightSrc="/light.png" 
+                darkSrc="/dark.png" 
+                alt="ScanWeb Dashboard Preview" 
+                className="w-full h-full object-cover" 
+              />
+            </div>
           </div>
         </div>
       </section>

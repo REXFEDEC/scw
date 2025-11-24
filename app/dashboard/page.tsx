@@ -101,48 +101,48 @@ export default async function DashboardPage() {
                 {scans.map((scan) => (
                   <div
                     key={scan.id}
-                    className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-secondary/50 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-border rounded-lg hover:bg-secondary/50 transition-colors gap-3"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h4 className="font-semibold text-foreground">{scan.url}</h4>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        <h4 className="font-semibold text-foreground text-sm sm:text-base break-all">{scan.url}</h4>
                         {scan.status === "completed" && (
-                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                          <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-xs">
                             Completed
                           </Badge>
                         )}
                         {scan.status === "scanning" && (
-                          <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20">
+                          <Badge variant="outline" className="bg-accent/10 text-accent border-accent/20 text-xs">
                             Scanning
                           </Badge>
                         )}
                         {scan.status === "pending" && (
-                          <Badge variant="outline" className="bg-muted text-muted-foreground">
+                          <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">
                             Pending
                           </Badge>
                         )}
                         {scan.status === "failed" && (
-                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20">
+                          <Badge variant="outline" className="bg-destructive/10 text-destructive border-destructive/20 text-xs">
                             Failed
                           </Badge>
                         )}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm text-muted-foreground">
                         <span>{new Date(scan.created_at).toLocaleDateString()}</span>
                         {scan.scan_duration && <span>{scan.scan_duration}s duration</span>}
                         {scan.vulnerabilities && (
                           <span className="flex items-center gap-1">
-                            <AlertTriangle className="w-4 h-4" />
+                            <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
                             {Object.keys(scan.vulnerabilities).length} vulnerabilities
                           </span>
                         )}
                       </div>
                     </div>
                     {scan.status === "completed" && (
-                      <Link href={`/scan/${scan.id}`}>
-                        <Button variant="outline" size="sm">
+                      <Link href={`/scan/${scan.id}`} className="w-full sm:w-auto">
+                        <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                          <ExternalLink className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
                           View Report
-                          <ExternalLink className="w-4 h-4 ml-2" />
                         </Button>
                       </Link>
                     )}
