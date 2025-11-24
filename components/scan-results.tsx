@@ -24,22 +24,44 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
   const [scan, setScan] = useState(initialScan)
   const [isPolling, setIsPolling] = useState(initialScan.status === "pending" || initialScan.status === "scanning")
 
-  useEffect(() => {
-    if (!isPolling) return
+  console.log("🔄 [RESULTS] ScanResults component mounted")
+  console.log("📊 [RESULTS] Initial scan data:", initialScan)
+  console.log("⏳ [RESULTS] Polling enabled:", isPolling)
 
+  useEffect(() => {
+    if (!isPolling) {
+      console.log("⏹️ [RESULTS] Polling disabled, stopping updates")
+      return
+    }
+
+    console.log("🔄 [RESULTS] Starting polling for scan updates...")
     const supabase = createClient()
     const pollInterval = setInterval(async () => {
+      console.log("🔍 [RESULTS] Polling for scan updates...")
       const { data } = await supabase.from("scans").select("*").eq("id", scan.id).single()
 
       if (data) {
+        console.log("📊 [RESULTS] Scan update received:", {
+          id: data.id,
+          status: data.status,
+          vulnerabilities: data.vulnerabilities ? Object.keys(data.vulnerabilities).length : 0,
+          duration: data.scan_duration
+        })
+        
         setScan(data)
         if (data.status === "completed" || data.status === "failed") {
+          console.log("✅ [RESULTS] Scan finished, stopping polling")
           setIsPolling(false)
         }
+      } else {
+        console.warn("⚠️ [RESULTS] No data received from poll")
       }
     }, 3000)
 
-    return () => clearInterval(pollInterval)
+    return () => {
+      console.log("🛑 [RESULTS] Cleaning up polling interval")
+      clearInterval(pollInterval)
+    }
   }, [isPolling, scan.id])
 
   const vulnerabilityCount = scan.vulnerabilities ? Object.keys(scan.vulnerabilities).length : 0
@@ -59,6 +81,7 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
   }
 
   const handleExport = () => {
+    console.log("📥 [RESULTS] Exporting scan report...")
     const reportData = {
       url: scan.url,
       scanDate: scan.created_at,
@@ -74,6 +97,7 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
     a.href = url
     a.download = `scan-report-${scan.id}.json`
     a.click()
+    console.log("✅ [RESULTS] Report exported successfully")
   }
 
   return (

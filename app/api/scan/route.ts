@@ -3,37 +3,58 @@ import { createClient } from "@/lib/supabase/server"
 import { scanWebsite, getAISummary } from "@/lib/scanner"
 
 export async function POST(request: NextRequest) {
+  console.log("🚀 [API] Scan endpoint hit")
+  
   try {
     const supabase = await createClient()
+    console.log("✅ [API] Supabase client created")
 
     // Verify user is authenticated
+    console.log("🔐 [API] Verifying user authentication...")
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser()
     if (authError || !user) {
+      console.error("❌ [API] Authentication failed:", authError)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+    console.log("✅ [API] User authenticated:", user.id)
 
     const body = await request.json()
+    console.log("📦 [API] Request body:", body)
     const { scanId, url } = body
 
     if (!scanId || !url) {
+      console.error("❌ [API] Missing required fields:", { scanId, url })
       return NextResponse.json({ error: "Missing scanId or url" }, { status: 400 })
     }
 
     // Update scan status to 'scanning'
-    await supabase.from("scans").update({ status: "scanning" }).eq("id", scanId).eq("user_id", user.id)
+    console.log("📝 [API] Updating scan status to 'scanning'...")
+    const { error: updateError } = await supabase
+      .from("scans")
+      .update({ status: "scanning" })
+      .eq("id", scanId)
+      .eq("user_id", user.id)
+    
+    if (updateError) {
+      console.error("❌ [API] Failed to update scan status:", updateError)
+      throw updateError
+    }
+    console.log("✅ [API] Scan status updated to 'scanning'")
 
     // Perform the scan (this runs in the background)
+    console.log("🔄 [API] Starting background scan process...")
     performScan(scanId, url, user.id).catch(console.error)
 
+    console.log("🎯 [API] Scan initiated successfully")
     return NextResponse.json({
       success: true,
       message: "Scan started",
     })
   } catch (error: unknown) {
-    console.error("[v0] Scan API error:", error)
+    console.error("💥 [API] Scan API error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
@@ -42,11 +63,19 @@ async function performScan(scanId: string, url: string, userId: string) {
   const startTime = Date.now()
   const supabase = await createClient()
 
+  console.log("🔍 [SCAN] Starting vulnerability scan...")
+  console.log("📍 [SCAN] Target URL:", url)
+  console.log("🆔 [SCAN] Scan ID:", scanId)
+  console.log("👤 [SCAN] User ID:", userId)
+
   try {
     // Perform the vulnerability scan
+    console.log("⏳ [SCAN] Fetching website content...")
     const scanResults = await scanWebsite(url)
+    console.log("📊 [SCAN] Raw scan results:", scanResults)
 
     if (scanResults.error) {
+      console.error("❌ [SCAN] Scan failed with error:", scanResults.error)
       // Update scan with error status
       await supabase
         .from("scans")
@@ -59,13 +88,19 @@ async function performScan(scanId: string, url: string, userId: string) {
       return
     }
 
+    console.log("✅ [SCAN] Scan completed successfully")
+
     // Get AI summary from Cloudflare Worker
+    console.log("🤖 [AI] Generating AI summary...")
     const aiSummary = await getAISummary(scanResults)
+    console.log("📝 [AI] AI summary generated, length:", aiSummary.length)
 
     // Format vulnerabilities for storage
     const vulnerabilities: Record<string, any> = {}
+    console.log("🔧 [SCAN] Processing vulnerabilities...")
 
     if (scanResults.missing_headers.length > 0) {
+      console.log("⚠️ [SCAN] Missing headers found:", scanResults.missing_headers)
       vulnerabilities.missing_security_headers = {
         type: "Missing Security Headers",
         severity: "High",
@@ -77,6 +112,7 @@ async function performScan(scanId: string, url: string, userId: string) {
     }
 
     if (scanResults.script_tags_found) {
+      console.log("⚠️ [SCAN] Script tags detected - potential XSS risk")
       vulnerabilities.potential_xss = {
         type: "Potential XSS Vulnerability",
         severity: "Medium",
@@ -88,6 +124,7 @@ async function performScan(scanId: string, url: string, userId: string) {
     }
 
     if (scanResults.sqli_risk) {
+      console.log("🚨 [SCAN] SQL injection patterns detected")
       vulnerabilities.sql_injection_patterns = {
         type: "SQL Injection Risk",
         severity: "Critical",
@@ -97,11 +134,15 @@ async function performScan(scanId: string, url: string, userId: string) {
       }
     }
 
+    console.log("📊 [SCAN] Total vulnerabilities found:", Object.keys(vulnerabilities).length)
+
     // Calculate scan duration
     const scanDuration = Math.round((Date.now() - startTime) / 1000)
+    console.log("⏱️ [SCAN] Scan duration:", scanDuration, "seconds")
 
     // Update scan record with results
-    await supabase
+    console.log("💾 [SCAN] Updating database with results...")
+    const { error: finalUpdateError } = await supabase
       .from("scans")
       .update({
         status: "completed",
@@ -112,8 +153,15 @@ async function performScan(scanId: string, url: string, userId: string) {
       })
       .eq("id", scanId)
       .eq("user_id", userId)
+
+    if (finalUpdateError) {
+      console.error("❌ [SCAN] Failed to update scan with results:", finalUpdateError)
+      throw finalUpdateError
+    }
+
+    console.log("🎉 [SCAN] Scan completed and results saved successfully!")
   } catch (error: unknown) {
-    console.error("[v0] Error performing scan:", error)
+    console.error("💥 [SCAN] Error performing scan:", error)
 
     // Update scan with error status
     await supabase
@@ -124,5 +172,7 @@ async function performScan(scanId: string, url: string, userId: string) {
       })
       .eq("id", scanId)
       .eq("user_id", userId)
+    
+    console.log("❌ [SCAN] Scan marked as failed")
   }
 }

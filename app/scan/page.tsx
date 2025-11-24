@@ -23,24 +23,32 @@ export default function ScanPage() {
     setIsScanning(true)
     setError(null)
 
+    console.log("🚀 Starting scan process...")
+    console.log("📍 URL submitted:", url)
+
     try {
       const supabase = createClient()
+      console.log("🔐 Getting authenticated user...")
 
       // Get current user
       const {
         data: { user },
       } = await supabase.auth.getUser()
       if (!user) {
+        console.error("❌ No authenticated user found")
         throw new Error("Not authenticated")
       }
+      console.log("✅ User authenticated:", user.id)
 
       // Validate URL
       let scanUrl = url.trim()
       if (!scanUrl.startsWith("http://") && !scanUrl.startsWith("https://")) {
         scanUrl = "https://" + scanUrl
       }
+      console.log("🔗 Validated scan URL:", scanUrl)
 
       // Create scan record
+      console.log("💾 Creating scan record in database...")
       const { data: scan, error: insertError } = await supabase
         .from("scans")
         .insert({
@@ -51,22 +59,36 @@ export default function ScanPage() {
         .select()
         .single()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error("❌ Database insert error:", insertError)
+        throw insertError
+      }
+      console.log("✅ Scan record created:", scan.id)
 
       // Trigger the scan via API route
+      console.log("📡 Calling scan API endpoint...")
       const response = await fetch("/api/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ scanId: scan.id, url: scanUrl }),
       })
 
+      console.log("📡 API response status:", response.status)
+      
       if (!response.ok) {
-        throw new Error("Failed to start scan")
+        const errorText = await response.text()
+        console.error("❌ API error response:", errorText)
+        throw new Error(`Failed to start scan: ${response.status}`)
       }
 
+      const responseData = await response.json()
+      console.log("✅ API response:", responseData)
+
       // Redirect to scan results page
+      console.log("🔄 Redirecting to scan results:", `/scan/${scan.id}`)
       router.push(`/scan/${scan.id}`)
     } catch (error: unknown) {
+      console.error("💥 Scan initiation failed:", error)
       setError(error instanceof Error ? error.message : "Failed to start scan")
       setIsScanning(false)
     }
