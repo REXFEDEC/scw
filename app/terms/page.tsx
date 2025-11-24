@@ -203,7 +203,7 @@ export default function TermsOfServicePage() {
               If you have questions about these Terms of Service, please contact us:
             </p>
             <div className="space-y-2 text-muted-foreground">
-              <p>Email: legal@scanweb.dev</p>
+              <p>Email: sameer@factorsphere.org</p>
               <p>We respond to legal inquiries within 48 hours.</p>
             </div>
           </CardContent>
