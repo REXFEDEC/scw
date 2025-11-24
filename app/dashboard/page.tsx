@@ -135,7 +135,8 @@ export default async function DashboardPage() {
                         {scan.vulnerabilities && (
                           <span className="flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3 sm:w-4 sm:h-4" />
-                            {Object.keys(scan.vulnerabilities).length} vulnerabilities
+                            <span className="font-medium">{Object.keys(scan.vulnerabilities).length}</span>
+                            <span className="hidden sm:inline">vulnerabilities</span>
                           </span>
                         )}
                       </div>

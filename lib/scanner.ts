@@ -2,6 +2,12 @@ interface ScanResults {
   missing_headers: string[]
   script_tags_found: boolean
   sqli_risk: boolean
+  info_disclosure: {
+    server_header: boolean
+    powered_by: boolean
+    php_version: boolean
+    asp_version: boolean
+  }
   error?: string
 }
 
@@ -12,6 +18,12 @@ export async function scanWebsite(url: string): Promise<ScanResults> {
     missing_headers: [],
     script_tags_found: false,
     sqli_risk: false,
+    info_disclosure: {
+      server_header: false,
+      powered_by: false,
+      php_version: false,
+      asp_version: false
+    }
   }
 
   try {
@@ -32,7 +44,15 @@ export async function scanWebsite(url: string): Promise<ScanResults> {
     console.log("📄 [SCANNER] HTML content length:", html.length, "characters")
 
     // Check for missing security headers
-    const headersToCheck = ["x-frame-options", "content-security-policy", "strict-transport-security"]
+    const headersToCheck = [
+      "x-frame-options", 
+      "content-security-policy", 
+      "strict-transport-security",
+      "x-content-type-options",      // Prevents MIME sniffing
+      "referrer-policy",             // Controls referrer information
+      "permissions-policy",          // Controls browser features
+      "cross-origin-embedder-policy"  // Controls cross-origin requests
+    ]
     console.log("🔍 [SCANNER] Checking security headers...")
 
     results.missing_headers = headersToCheck.filter((header) => !headers.has(header))
@@ -44,16 +64,49 @@ export async function scanWebsite(url: string): Promise<ScanResults> {
     })
     console.log("⚠️ [SCANNER] Missing headers:", results.missing_headers)
 
-    // Naive XSS check - look for script tags
-    console.log("🔍 [SCANNER] Checking for script tags...")
-    results.script_tags_found = html.toLowerCase().includes("<script>")
-    console.log("📝 [SCANNER] Script tags found:", results.script_tags_found)
+    // Enhanced XSS check - look for various XSS patterns
+    console.log("🔍 [SCANNER] Checking for XSS patterns...")
+    const xssPatterns = [
+      "<script",
+      "javascript:",
+      "onload=",
+      "onerror=",
+      "onclick=",
+      "onmouseover=",
+      "eval(",
+      "alert(",
+      "prompt(",
+      "confirm("
+    ]
+    results.script_tags_found = xssPatterns.some((pattern) => 
+      html.toLowerCase().includes(pattern.toLowerCase())
+    )
+    console.log("📝 [SCANNER] XSS patterns found:", results.script_tags_found)
 
     // Naive SQLi check - look for common SQL injection patterns in URL
     console.log("🔍 [SCANNER] Checking for SQL injection patterns...")
     const sqlPatterns = ["'", '"', "--", "/*", "*/"]
     results.sqli_risk = sqlPatterns.some((pattern) => url.includes(pattern))
     console.log("💉 [SCANNER] SQL injection risk:", results.sqli_risk)
+
+    // Information disclosure checks
+    console.log("🔍 [SCANNER] Checking for information disclosure...")
+    
+    // Check for server header disclosure
+    const serverHeader = headers.get("server")
+    results.info_disclosure.server_header = !!serverHeader && serverHeader.length > 0
+    
+    // Check for X-Powered-By header
+    const poweredByHeader = headers.get("x-powered-by")
+    results.info_disclosure.powered_by = !!poweredByHeader
+    
+    // Check for PHP version disclosure in headers
+    results.info_disclosure.php_version = !!(serverHeader && serverHeader.toLowerCase().includes("php"))
+    
+    // Check for ASP.NET version disclosure
+    results.info_disclosure.asp_version = !!(serverHeader && serverHeader.toLowerCase().includes("asp"))
+    
+    console.log("📋 [SCANNER] Information disclosure:", results.info_disclosure)
 
     console.log("✅ [SCANNER] Scan completed successfully")
     console.log("📊 [SCANNER] Final results:", results)
@@ -65,6 +118,12 @@ export async function scanWebsite(url: string): Promise<ScanResults> {
       missing_headers: [],
       script_tags_found: false,
       sqli_risk: false,
+      info_disclosure: {
+        server_header: false,
+        powered_by: false,
+        php_version: false,
+        asp_version: false
+      },
       error: error instanceof Error ? error.message : "Unknown error occurred",
     }
   }

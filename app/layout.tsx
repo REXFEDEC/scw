@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { ThemeProvider } from 'next-themes'
+import { PWAInstallPrompt } from "@/components/pwa-install-prompt"
 
 const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
@@ -74,6 +75,19 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="mask-icon" href="/icon.svg" color="#2563eb" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                  console.log('SW registered: ', registration);
+                }, function(err) {
+                  console.log('SW registration failed: ', err);
+                });
+              });
+            }
+          `
+        }} />
       </head>
       <body className={`font-sans antialiased`}>
         <ThemeProvider
@@ -83,6 +97,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <PWAInstallPrompt />
         </ThemeProvider>
         <Analytics />
       </body>

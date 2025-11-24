@@ -105,8 +105,10 @@ export default function ScanPage() {
           <div className="flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mx-auto mb-4">
             <Shield className="w-8 h-8 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">New Vulnerability Scan</h1>
-          <p className="text-muted-foreground">Enter a website URL to begin comprehensive security analysis</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">What We Scan</h2>
+          <p className="text-muted-foreground mb-6">
+            Our comprehensive scanner checks for multiple vulnerability categories to secure your web application.
+          </p>
         </div>
 
         <Card>
@@ -160,26 +162,34 @@ export default function ScanPage() {
             <CardTitle className="text-lg">What We Scan For</CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-sm text-muted-foreground">
+            <ul className="space-y-3 text-muted-foreground">
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                <span>Cross-Site Scripting (XSS) vulnerabilities</span>
+                <div>
+                  <span className="font-medium text-foreground">Security Headers Analysis</span>
+                  <span className="block text-sm">7 critical headers including CSP, HSTS, X-Frame-Options, and more</span>
+                </div>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                <span>SQL Injection attack vectors</span>
+                <div>
+                  <span className="font-medium text-foreground">Cross-Site Scripting (XSS) Detection</span>
+                  <span className="block text-sm">10+ patterns including script tags, event handlers, and JavaScript functions</span>
+                </div>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                <span>Cross-Site Request Forgery (CSRF) protections</span>
+                <div>
+                  <span className="font-medium text-foreground">SQL Injection Risk Assessment</span>
+                  <span className="block text-sm">URL parameter analysis for common injection patterns</span>
+                </div>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary mt-0.5">•</span>
-                <span>Security header misconfigurations</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-primary mt-0.5">•</span>
-                <span>Outdated software and known CVEs</span>
+                <div>
+                  <span className="font-medium text-foreground">Information Disclosure Detection</span>
+                  <span className="block text-sm">Server headers, technology stack, and version exposure analysis</span>
+                </div>
               </li>
             </ul>
           </CardContent>

@@ -69,6 +69,7 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case "critical":
+        return "text-destructive"
       case "high":
         return "text-destructive"
       case "medium":
@@ -77,6 +78,21 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
         return "text-primary"
       default:
         return "text-muted-foreground"
+    }
+  }
+
+  const getSeverityBadgeColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case "critical":
+        return "bg-destructive/10 text-destructive border-destructive/20"
+      case "high":
+        return "bg-destructive/10 text-destructive border-destructive/20"
+      case "medium":
+        return "bg-accent/10 text-accent border-accent/20"
+      case "low":
+        return "bg-primary/10 text-primary border-primary/20"
+      default:
+        return "bg-muted text-muted-foreground"
     }
   }
 
@@ -211,7 +227,7 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
                         <AlertTriangle className={`w-5 h-5 ${getSeverityColor(vuln.severity || "medium")}`} />
                         <h4 className="font-semibold text-foreground">{vuln.type || key}</h4>
                       </div>
-                      <Badge variant="outline" className={getSeverityColor(vuln.severity || "medium")}>
+                      <Badge variant="outline" className={getSeverityBadgeColor(vuln.severity || "medium")}>
                         {vuln.severity || "Medium"}
                       </Badge>
                     </div>

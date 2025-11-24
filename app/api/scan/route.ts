@@ -6,6 +6,12 @@ interface ScanResults {
   missing_headers: string[]
   script_tags_found: boolean
   sqli_risk: boolean
+  info_disclosure: {
+    server_header: boolean
+    powered_by: boolean
+    php_version: boolean
+    asp_version: boolean
+  }
   error?: string
 }
 
@@ -142,6 +148,40 @@ async function performScan(scanId: string, url: string) {
         description: "The URL contains patterns commonly associated with SQL injection attacks.",
         recommendation:
           "Use parameterized queries and prepared statements. Never concatenate user input directly into SQL queries.",
+      }
+    }
+
+    // Information disclosure vulnerabilities
+    if (scanResults.info_disclosure.server_header) {
+      console.log("⚠️ [SCAN] Server header disclosure detected")
+      vulnerabilities.server_disclosure = {
+        type: "Server Information Disclosure",
+        severity: "Low",
+        description: "The server is revealing its software version through HTTP headers.",
+        recommendation:
+          "Configure your web server to hide or obscure server version information in HTTP headers.",
+      }
+    }
+
+    if (scanResults.info_disclosure.powered_by) {
+      console.log("⚠️ [SCAN] X-Powered-By header disclosure detected")
+      vulnerabilities.powered_by_disclosure = {
+        type: "Technology Stack Disclosure",
+        severity: "Low",
+        description: "The application is revealing its underlying technology stack.",
+        recommendation:
+          "Remove or obscure X-Powered-By headers to hide technology information from potential attackers.",
+      }
+    }
+
+    if (scanResults.info_disclosure.php_version || scanResults.info_disclosure.asp_version) {
+      console.log("⚠️ [SCAN] Framework version disclosure detected")
+      vulnerabilities.version_disclosure = {
+        type: "Framework Version Disclosure",
+        severity: "Medium",
+        description: "The application is revealing specific framework or language version information.",
+        recommendation:
+          "Configure your framework to hide version numbers and update to the latest secure version.",
       }
     }
 
