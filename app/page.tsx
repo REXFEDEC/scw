@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Shield, Zap, Brain, Lock, Search, FileText } from "lucide-react"
 import { PublicNavigation } from "@/components/public-navigation"
 import { ThemeAwareImage } from "@/components/theme-aware-image"
+import { Footer } from "@/components/footer"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 export default function LandingPage() {
   return (
@@ -148,20 +150,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col items-center gap-4 text-center">
-            <div className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-primary" />
-              <span className="font-semibold text-foreground">ScanWeb</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              © 2025 ScanWeb. Professional vulnerability scanning platform.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
+      <ScrollToTop />
     </div>
   )
 }

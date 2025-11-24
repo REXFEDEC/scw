@@ -55,33 +55,36 @@ export function Navigation() {
               variant="ghost"
               size="icon"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="relative"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <div className="w-6 h-5 flex flex-col justify-center items-center">
+                <span className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : 'translate-y-0'}`} />
+                <span className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-in-out mt-1 ${mobileMenuOpen ? 'opacity-0' : 'opacity-100'}`} />
+                <span className={`block w-6 h-0.5 bg-current transition-all duration-300 ease-in-out mt-1 ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : 'translate-y-0'}`} />
+              </div>
             </Button>
           </div>
         </div>
 
         {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border py-4">
-            <div className="flex flex-col gap-2">
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">
-                  Dashboard
-                </Button>
-              </Link>
-              <Link href="/scan" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="ghost" className="w-full justify-start">
-                  New Scan
-                </Button>
-              </Link>
-              <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
-                <LogOut className="w-5 h-5 mr-2" />
-                Logout
+        <div className={`md:hidden border-t border-border transition-all duration-300 ease-in-out overflow-hidden ${mobileMenuOpen ? 'max-h-64 py-4' : 'max-h-0'}`}>
+          <div className="flex flex-col gap-2">
+            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start">
+                Dashboard
               </Button>
-            </div>
+            </Link>
+            <Link href="/scan" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start">
+                New Scan
+              </Button>
+            </Link>
+            <Button variant="ghost" onClick={handleLogout} className="w-full justify-start">
+              <LogOut className="w-5 h-5 mr-2" />
+              Logout
+            </Button>
           </div>
-        )}
+        </div>
       </div>
     </nav>
   )

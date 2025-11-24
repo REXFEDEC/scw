@@ -1,11 +1,13 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
 import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
+import { ScrollToTop } from "@/components/scroll-to-top"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Shield, AlertTriangle, ExternalLink, Search, Clock, CheckCircle } from "lucide-react"
 import Link from "next/link"
-import { Shield, AlertTriangle, CheckCircle, Clock, ExternalLink } from "lucide-react"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -153,6 +155,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Footer />
+      <ScrollToTop />
     </div>
   )
 }
