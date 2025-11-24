@@ -36,14 +36,10 @@ export async function POST(request: NextRequest) {
     }
     console.log("✅ [API] Scan status updated to 'scanning'")
 
-    // Perform the scan (this runs in the background)
-    console.log("🔄 [API] Starting background scan process...")
-    
-    // Don't wait for the scan to complete - return immediately
-    // This prevents Vercel function timeout
-    performScan(scanId, url).catch((error) => {
-      console.error("💥 [API] Background scan failed:", error)
-    })
+    // Perform the scan synchronously for debugging
+    console.log("🔄 [API] Starting scan process...")
+    await performScan(scanId, url)
+    console.log("✅ [API] Scan completed")
 
     console.log("🎯 [API] Scan initiated successfully")
     return NextResponse.json({
