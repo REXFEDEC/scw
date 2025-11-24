@@ -123,6 +123,7 @@ export default function SignUpPage() {
               </form>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </div>

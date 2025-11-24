@@ -52,7 +52,7 @@ export default function LoginPage() {
               <span className="text-2xl font-bold text-foreground">ScanWeb</span>
             </div>
 
-          <Card>
+            <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Login</CardTitle>
               <CardDescription>Enter your credentials to access your dashboard</CardDescription>
@@ -95,6 +95,7 @@ export default function LoginPage() {
               </form>
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </div>
