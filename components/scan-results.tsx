@@ -167,8 +167,25 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
             <CardDescription>Intelligent analysis and recommendations for your security posture</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-sm max-w-none dark:prose-invert">
-              <ReactMarkdown>{scan.ai_summary}</ReactMarkdown>
+            <div className="prose prose-sm max-w-none dark:prose-invert break-words">
+              <ReactMarkdown 
+                components={{
+                  p: ({children}: any) => <p className="mb-4 break-words">{children}</p>,
+                  ul: ({children}: any) => <ul className="list-disc pl-6 mb-4 break-words">{children}</ul>,
+                  ol: ({children}: any) => <ol className="list-decimal pl-6 mb-4 break-words">{children}</ol>,
+                  li: ({children}: any) => <li className="mb-2 break-words">{children}</li>,
+                  h1: ({children}: any) => <h1 className="text-2xl font-bold mb-4 break-words">{children}</h1>,
+                  h2: ({children}: any) => <h2 className="text-xl font-bold mb-3 break-words">{children}</h2>,
+                  h3: ({children}: any) => <h3 className="text-lg font-bold mb-2 break-words">{children}</h3>,
+                  code: ({children, inline}: any) => 
+                    inline ? 
+                      <code className="bg-muted px-1 py-0.5 rounded text-sm break-all">{children}</code> : 
+                      <pre className="bg-muted p-3 rounded-md overflow-x-auto text-sm"><code>{children}</code></pre>,
+                  blockquote: ({children}: any) => <blockquote className="border-l-4 border-primary pl-4 italic break-words">{children}</blockquote>,
+                }}
+              >
+                {scan.ai_summary}
+              </ReactMarkdown>
             </div>
           </CardContent>
         </Card>
