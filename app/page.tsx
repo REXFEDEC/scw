@@ -2,29 +2,12 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Shield, Zap, Brain, Lock, Search, FileText } from "lucide-react"
+import { PublicNavigation } from "@/components/public-navigation"
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
-      <nav className="border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <Shield className="w-8 h-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">ScanWeb</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link href="/auth/login">
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link href="/auth/sign-up">
-                <Button>Get Started</Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <PublicNavigation />
 
       {/* Hero Section */}
       <section className="py-20 px-4 sm:px-6 lg:px-8">

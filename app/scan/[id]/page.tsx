@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
-import { NavBar } from "@/components/nav-bar"
+import { Navigation } from "@/components/navigation"
 import { ScanResults } from "@/components/scan-results"
 
 export default async function ScanResultPage({
@@ -33,7 +33,7 @@ export default async function ScanResultPage({
 
   return (
     <div className="min-h-screen bg-background">
-      <NavBar />
+      <Navigation />
       <ScanResults scan={scan} />
     </div>
   )

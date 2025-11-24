@@ -11,6 +11,7 @@ import { Shield } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { PublicNavigation } from "@/components/public-navigation"
 
 export default function SignUpPage() {
   const [email, setEmail] = useState("")
@@ -56,15 +57,18 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex min-h-screen w-full items-center justify-center p-6 bg-secondary/30">
-      <div className="w-full max-w-sm">
-        <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Shield className="w-10 h-10 text-primary" />
-            <span className="text-2xl font-bold text-foreground">ScanWeb</span>
-          </div>
+    <div className="min-h-screen bg-background">
+      <PublicNavigation />
+      
+      <div className="flex min-h-screen w-full items-center justify-center p-6 bg-secondary/30">
+        <div className="w-full max-w-sm">
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Shield className="w-10 h-10 text-primary" />
+              <span className="text-2xl font-bold text-foreground">ScanWeb</span>
+            </div>
 
-          <Card>
+            <Card>
             <CardHeader>
               <CardTitle className="text-2xl">Sign up</CardTitle>
               <CardDescription>Create an account to start scanning websites</CardDescription>
