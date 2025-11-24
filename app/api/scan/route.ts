@@ -2,6 +2,13 @@ import { type NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { scanWebsite, getAISummary } from "@/lib/scanner"
 
+interface ScanResults {
+  missing_headers: string[]
+  script_tags_found: boolean
+  sqli_risk: boolean
+  error?: string
+}
+
 export async function POST(request: NextRequest) {
   console.log("🚀 [API] Scan endpoint hit")
   
@@ -46,7 +53,12 @@ export async function POST(request: NextRequest) {
 
     // Perform the scan (this runs in the background)
     console.log("🔄 [API] Starting background scan process...")
-    performScan(scanId, url, user.id).catch(console.error)
+    
+    // Don't wait for the scan to complete - return immediately
+    // This prevents Vercel function timeout
+    performScan(scanId, url, user.id).catch((error) => {
+      console.error("💥 [API] Background scan failed:", error)
+    })
 
     console.log("🎯 [API] Scan initiated successfully")
     return NextResponse.json({
@@ -71,7 +83,15 @@ async function performScan(scanId: string, url: string, userId: string) {
   try {
     // Perform the vulnerability scan
     console.log("⏳ [SCAN] Fetching website content...")
-    const scanResults = await scanWebsite(url)
+    
+    // Add timeout handling for the fetch
+    const scanResults = await Promise.race([
+      scanWebsite(url),
+      new Promise<ScanResults>((_, reject) => 
+        setTimeout(() => reject(new Error("Scan timeout after 15 seconds")), 15000)
+      )
+    ])
+    
     console.log("📊 [SCAN] Raw scan results:", scanResults)
 
     if (scanResults.error) {
@@ -90,10 +110,22 @@ async function performScan(scanId: string, url: string, userId: string) {
 
     console.log("✅ [SCAN] Scan completed successfully")
 
-    // Get AI summary from Cloudflare Worker
+    // Get AI summary from Cloudflare Worker (with timeout)
     console.log("🤖 [AI] Generating AI summary...")
-    const aiSummary = await getAISummary(scanResults)
-    console.log("📝 [AI] AI summary generated, length:", aiSummary.length)
+    let aiSummary = "AI summary unavailable"
+    
+    try {
+      aiSummary = await Promise.race([
+        getAISummary(scanResults),
+        new Promise<string>((_, reject) => 
+          setTimeout(() => reject(new Error("AI summary timeout")), 10000)
+        )
+      ])
+      console.log("📝 [AI] AI summary generated, length:", aiSummary.length)
+    } catch (aiError) {
+      console.error("❌ [AI] AI summary failed:", aiError)
+      aiSummary = "AI summary generation failed due to timeout or network issues."
+    }
 
     // Format vulnerabilities for storage
     const vulnerabilities: Record<string, any> = {}
@@ -164,15 +196,19 @@ async function performScan(scanId: string, url: string, userId: string) {
     console.error("💥 [SCAN] Error performing scan:", error)
 
     // Update scan with error status
-    await supabase
-      .from("scans")
-      .update({
-        status: "failed",
-        scan_duration: Math.round((Date.now() - startTime) / 1000),
-      })
-      .eq("id", scanId)
-      .eq("user_id", userId)
-    
-    console.log("❌ [SCAN] Scan marked as failed")
+    try {
+      await supabase
+        .from("scans")
+        .update({
+          status: "failed",
+          scan_duration: Math.round((Date.now() - startTime) / 1000),
+        })
+        .eq("id", scanId)
+        .eq("user_id", userId)
+      
+      console.log("❌ [SCAN] Scan marked as failed")
+    } catch (updateError) {
+      console.error("💥 [SCAN] Failed to update failed status:", updateError)
+    }
   }
 }
