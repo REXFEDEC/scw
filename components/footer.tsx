@@ -1,8 +1,7 @@
 "use client"
 
-import { Shield, Mail, Github, Twitter, Linkedin } from "lucide-react"
+import { Shield } from "lucide-react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 
 export function Footer() {
   return (
@@ -18,20 +17,6 @@ export function Footer() {
             <p className="text-muted-foreground mb-4 max-w-md">
               Professional vulnerability scanning platform powered by AI. Protect your web applications with comprehensive security analysis.
             </p>
-            <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Github className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Twitter className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Linkedin className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Mail className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
           {/* Product */}
@@ -51,11 +36,6 @@ export function Footer() {
               <li>
                 <Link href="/#features" className="text-muted-foreground hover:text-foreground transition-colors">
                   Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Pricing
                 </Link>
               </li>
             </ul>
@@ -80,11 +60,6 @@ export function Footer() {
                   Terms of Service
                 </Link>
               </li>
-              <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Contact
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
@@ -95,7 +70,7 @@ export function Footer() {
               © 2025 ScanWeb. Professional vulnerability scanning platform.
             </p>
             <p className="text-sm text-muted-foreground">
-              Built with ❤️ for security professionals
+              Built by Students for Professionals.
             </p>
           </div>
         </div>
