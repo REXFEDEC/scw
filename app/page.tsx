@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Shield, Zap, Brain, Lock, Search, FileText } from "lucide-react"
 import { PublicNavigation } from "@/components/public-navigation"
+import { ThemeAwareImage } from "@/components/theme-aware-image"
 
 export default function LandingPage() {
   return (
@@ -36,7 +37,12 @@ export default function LandingPage() {
 
           {/* Hero Image */}
           <div className="mt-16 rounded-lg overflow-hidden border border-border shadow-2xl">
-            <img src="/security-dashboard-with-vulnerability-scan-results.jpg" alt="ScanWeb Dashboard Preview" className="w-full" />
+            <ThemeAwareImage 
+              lightSrc="/light.png" 
+              darkSrc="/dark.png" 
+              alt="ScanWeb Dashboard Preview" 
+              className="w-full" 
+            />
           </div>
         </div>
       </section>
