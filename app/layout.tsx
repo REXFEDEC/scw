@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'ScanWeb - Professional Vulnerability Scanner',
     description: 'Professional web vulnerability scanning with AI-powered analysis. Discover security issues and get comprehensive reports.',
-    url: 'https://scanweb.vercel.app',
+    url: 'https://scan.goneto.space',
     siteName: 'ScanWeb',
     images: [
       {
