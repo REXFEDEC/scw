@@ -11,6 +11,28 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: 'ScanWeb - Professional Vulnerability Scanner',
   description: 'Professional web vulnerability scanning with AI-powered analysis. Discover security issues and get comprehensive reports.',
+  openGraph: {
+    title: 'ScanWeb - Professional Vulnerability Scanner',
+    description: 'Professional web vulnerability scanning with AI-powered analysis. Discover security issues and get comprehensive reports.',
+    url: 'https://scanweb.vercel.app',
+    siteName: 'ScanWeb',
+    images: [
+      {
+        url: '/meta.png',
+        width: 1199,
+        height: 619,
+        alt: 'ScanWeb - Professional Vulnerability Scanner',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ScanWeb - Professional Vulnerability Scanner',
+    description: 'Professional web vulnerability scanning with AI-powered analysis. Discover security issues and get comprehensive reports.',
+    images: ['/meta.png'],
+  },
   icons: {
     icon: [
       {
