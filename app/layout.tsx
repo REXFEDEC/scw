@@ -113,7 +113,7 @@ export default function RootLayout({
           `
         }} />
       </head>
-      <body className={`font-sans antialiased pt-16`}>
+      <body className={`font-sans antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"

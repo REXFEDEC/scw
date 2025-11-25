@@ -5,11 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Shield, LogOut } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 
 export function NavBar() {
   const router = useRouter()
-  const [scrolled, setScrolled] = useState(false)
 
   const handleLogout = async () => {
     const supabase = createClient()
@@ -17,22 +15,8 @@ export function NavBar() {
     router.push("/")
   }
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 10
-      setScrolled(isScrolled)
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-      scrolled 
-        ? 'bg-background/80 backdrop-blur-md border-b border-border/50 shadow-lg' 
-        : 'bg-background border-b border-border'
-    }`}>
+    <nav className="border-b border-border bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/dashboard" className="flex items-center gap-2">
