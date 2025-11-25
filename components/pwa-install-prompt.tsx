@@ -14,6 +14,7 @@ export function PWAInstallPrompt() {
   const [showPrompt, setShowPrompt] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [isIOS, setIsIOS] = useState(false)
+  const [hasShownThisSession, setHasShownThisSession] = useState(false)
 
   useEffect(() => {
     // Check if it's iOS
@@ -26,10 +27,18 @@ export function PWAInstallPrompt() {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       
-      // Show prompt after a delay to avoid being too intrusive
-      setTimeout(() => {
-        setShowPrompt(true)
-      }, 3000)
+      // Check if we've already shown the prompt this session
+      const alreadyShown = sessionStorage.getItem('pwa-prompt-shown') === 'true'
+      const wasDismissed = sessionStorage.getItem('pwa-prompt-dismissed') === 'true'
+      
+      if (!alreadyShown && !wasDismissed && !hasShownThisSession) {
+        // Show prompt after a delay to avoid being too intrusive
+        setTimeout(() => {
+          setShowPrompt(true)
+          setHasShownThisSession(true)
+          sessionStorage.setItem('pwa-prompt-shown', 'true')
+        }, 3000)
+      }
     }
 
     // Listen for appinstalled event
@@ -70,8 +79,12 @@ export function PWAInstallPrompt() {
 
   // Don't show if dismissed in this session or if it's iOS (different flow)
   useEffect(() => {
-    if (sessionStorage.getItem('pwa-prompt-dismissed') === 'true') {
+    const wasDismissed = sessionStorage.getItem('pwa-prompt-dismissed') === 'true'
+    const alreadyShown = sessionStorage.getItem('pwa-prompt-shown') === 'true'
+    
+    if (wasDismissed || alreadyShown) {
       setShowPrompt(false)
+      setHasShownThisSession(true)
     }
   }, [])
 
