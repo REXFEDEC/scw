@@ -27,16 +27,15 @@ export function PWAInstallPrompt() {
       e.preventDefault()
       setDeferredPrompt(e as BeforeInstallPromptEvent)
       
-      // Check if we've already shown the prompt this session
-      const alreadyShown = sessionStorage.getItem('pwa-prompt-shown') === 'true'
-      const wasDismissed = sessionStorage.getItem('pwa-prompt-dismissed') === 'true'
+      // Check if user has dismissed the prompt within the last hour
+      const dismissedUntil = localStorage.getItem('pwa-prompt-dismissed-until')
+      const now = Date.now()
       
-      if (!alreadyShown && !wasDismissed && !hasShownThisSession) {
-        // Show prompt after a delay to avoid being too intrusive
+      if (!dismissedUntil || parseInt(dismissedUntil) <= now) {
+        // Not within dismissal period, show prompt after delay
         setTimeout(() => {
           setShowPrompt(true)
           setHasShownThisSession(true)
-          sessionStorage.setItem('pwa-prompt-shown', 'true')
         }, 3000)
       }
     }
@@ -73,18 +72,23 @@ export function PWAInstallPrompt() {
 
   const handleDismiss = () => {
     setShowPrompt(false)
-    // Don't show again for this session
-    sessionStorage.setItem('pwa-prompt-dismissed', 'true')
+    // Don't show again for 1 hour
+    const oneHourFromNow = Date.now() + (60 * 60 * 1000)
+    localStorage.setItem('pwa-prompt-dismissed-until', oneHourFromNow.toString())
   }
 
-  // Don't show if dismissed in this session or if it's iOS (different flow)
+  // Don't show if dismissed within the last hour or if it's iOS (different flow)
   useEffect(() => {
-    const wasDismissed = sessionStorage.getItem('pwa-prompt-dismissed') === 'true'
-    const alreadyShown = sessionStorage.getItem('pwa-prompt-shown') === 'true'
+    const dismissedUntil = localStorage.getItem('pwa-prompt-dismissed-until')
+    const now = Date.now()
     
-    if (wasDismissed || alreadyShown) {
+    if (dismissedUntil && parseInt(dismissedUntil) > now) {
+      // Still within the 1-hour dismissal period
       setShowPrompt(false)
       setHasShownThisSession(true)
+    } else if (dismissedUntil && parseInt(dismissedUntil) <= now) {
+      // 1-hour period has passed, clear the storage
+      localStorage.removeItem('pwa-prompt-dismissed-until')
     }
   }, [])
 
