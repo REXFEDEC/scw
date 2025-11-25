@@ -191,6 +191,15 @@ async function performScan(scanId: string, url: string) {
     const scanDuration = Math.round((Date.now() - startTime) / 1000)
     console.log("⏱️ [SCAN] Scan duration:", scanDuration, "seconds")
 
+    // Ensure minimum scan duration of 10 seconds
+    const minDuration = 10
+    const finalDuration = Math.max(scanDuration, minDuration)
+    if (scanDuration < minDuration) {
+      const delayMs = (minDuration - scanDuration) * 1000
+      console.log("⏳ [SCAN] Backend Delay:", delayMs, "ms")
+      await new Promise(resolve => setTimeout(resolve, delayMs))
+    }
+
     // Update scan record with results
     console.log("💾 [SCAN] Updating database with results...")
     const { error: finalUpdateError } = await supabase
@@ -199,7 +208,7 @@ async function performScan(scanId: string, url: string) {
         status: "completed",
         vulnerabilities: Object.keys(vulnerabilities).length > 0 ? vulnerabilities : null,
         ai_summary: aiSummary,
-        scan_duration: scanDuration,
+        scan_duration: finalDuration,
         completed_at: new Date().toISOString(),
       })
       .eq("id", scanId)

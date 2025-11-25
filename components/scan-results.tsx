@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Shield, AlertTriangle, CheckCircle, Loader2, Clock, Download } from "lucide-react"
 import Link from "next/link"
 import ReactMarkdown from "react-markdown"
+import { setupScanNotifications, showScanCompleteNotification } from "@/lib/notifications"
 
 type Scan = {
   id: string
@@ -27,6 +28,11 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
   console.log("🔄 [RESULTS] ScanResults component mounted")
   console.log("📊 [RESULTS] Initial scan data:", initialScan)
   console.log("⏳ [RESULTS] Polling enabled:", isPolling)
+
+  // Setup notifications on component mount
+  useEffect(() => {
+    setupScanNotifications()
+  }, [])
 
   useEffect(() => {
     if (!isPolling) {
@@ -52,6 +58,12 @@ export function ScanResults({ scan: initialScan }: { scan: Scan }) {
         if (data.status === "completed" || data.status === "failed") {
           console.log("✅ [RESULTS] Scan finished, stopping polling")
           setIsPolling(false)
+          
+          // Show notification when scan completes
+          if (data.status === "completed") {
+            const vulnCount = data.vulnerabilities ? Object.keys(data.vulnerabilities).length : 0
+            showScanCompleteNotification(window.location.href, vulnCount)
+          }
         }
       } else {
         console.warn("⚠️ [RESULTS] No data received from poll")
